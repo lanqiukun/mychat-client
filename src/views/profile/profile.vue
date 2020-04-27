@@ -22,21 +22,22 @@ export default {
     },
   created() {
     console.log("profile created");
-      console.log(this.$store.state.relation)
-      console.log(this.$store.state.contact)
 
   },
 
     methods: {
         logout() {
             
+            localStorage.removeItem("strid")
+            localStorage.removeItem("token")
+
             this.current_user.strid = ""
             this.current_user.nickname = ""
             this.current_user.avatar = ""
             this.current_user.login = false
             this.ws.close();
 
-            this.$router.replace("/login")
+            this.$router.replace("/")
 
         }
     }

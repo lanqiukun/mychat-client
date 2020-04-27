@@ -111,11 +111,16 @@ export default {
           nickname: this.relation.nickname,
           message: []
         });
+        console.log(this.relation);
+        console.log(this.$store.state.contact);
         this.contact = this.$store.getters.getContact(this.strid);
+        console.log(this.contact);
       }
 
-      this.$store.getters.pushMessageAndUpdateOrder(msg2local, this.contact)
+      // console.log(this.relation)
+      // console.log(this.contact)
 
+      this.$store.getters.pushMessageAndUpdateOrder(msg2local, this.contact);
 
       this.ws.send(JSON.stringify(msg2server));
 
@@ -123,23 +128,28 @@ export default {
 
       let mydialogbody = document.getElementById("mydialogbody");
 
-      setTimeout(() => {
-        mydialogbody.scrollTop =
-          mydialogbody.scrollHeight - mydialogbody.clientHeight;
-      }, 200);
+      for (let i = 0; i < 10; i++)
+        setTimeout(() => {
+          mydialogbody.scrollTop =
+            mydialogbody.scrollHeight - mydialogbody.clientHeight;
+        }, i * 50);
     }
   },
   computed: {},
   mounted() {
-    //刷新用户昵称头像
-    console.log("this.target: ");
-    console.log(this.target);
-    console.log(this.$store.state.contact);
+    console.log(11111111111)
+    console.log(this.current_user.avatar)
+    console.log(this.current_user.strid)
+    console.log(this.current_user.token)
+    console.log(this.current_user.nickname)
   },
   created() {
     this.strid = this.$route.params.target;
     this.contact = this.$store.getters.getContact(this.strid);
     this.relation = this.$store.getters.getRelation(this.strid);
+
+    console.log(this.contact);
+    console.log(this.relation);
 
     console.log("mydialog created");
   },
@@ -156,6 +166,8 @@ export default {
   }
 };
 </script>
+
+
 
 <style lang="scss" scoped>
 #mydialog {

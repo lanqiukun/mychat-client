@@ -1,14 +1,13 @@
 <template>
   <div id="login">
     <div id="github" @click="github_login">
-      <div>
+      <div class="icon">
         <img :class="{'rotate': !clicked}" src="../../assets/img/login/github.png" alt />
+      </div>
+      <div class="description">
         <div v-if="clicked">GitHub登录</div>
       </div>
     </div>
-    <!-- login page
-        <input type="text" placeholder="请输入账号" @keydown.enter="login" v-model="account" autofocus>
-    <div @click="login">登录</div>-->
   </div>
 </template>
 
@@ -34,10 +33,9 @@ export default {
 
     github_login() {
       this.clicked = false;
-      
+
       if (this.getQueryVariable("code") == null)
-        window.location.href =
-          "https://github.com/login/oauth/authorize?client_id=ba3fb2199f63b790df64";
+        window.location.href = "https://github.com/login/oauth/authorize?client_id=ba3fb2199f63b790df64&scope=user:email";
     }
   },
   mounted() {}
@@ -46,8 +44,8 @@ export default {
 
 <style lang="scss" scoped>
 .rotate {
-    transition-duration: 60s;
-    transform: rotate(20000deg);
+  transition-duration: 60s;
+  transform: rotate(20000deg);
 }
 
 #login {
@@ -57,34 +55,45 @@ export default {
   background-position: center;
   background-size: cover;
   > #github {
-    position: fixed;
     width: 100%;
-    bottom: 30%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+    height: 100%;
 
-    animation-delay: 0ms;
-    animation-duration: 1600ms;
-    animation-timing-function: ease;
-    animation-iteration-count: initial;
-    animation-name: down;
-
-    > div > div {
-      animation-delay: 100ms;
+    .icon,
+    .description {
+      position: fixed;
+      width: 100%;
+      margin: 0 auto;
+      animation-duration: 1600ms;
+      animation-timing-function: ease;
+      animation-iteration-count: initial;
+      animation-name: raise;
     }
 
-    > div {
-      height: 160px;
-      margin-top: 10px;
-      font-weight: bold;
+    .icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      bottom: 35%;
+
+      animation-delay: 0ms;
+    }
+
+    .description {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      bottom: calc(35% - 25px);
+      
+
+      animation-delay: 120ms;
+      font-weight: bolder;
     }
   }
 }
 
-@keyframes down {
+@keyframes raise {
   from {
+    position: fixed;
     bottom: 0;
   }
 }

@@ -1,56 +1,109 @@
-<template></template>
+<template>
+  <div>
+    <div v-if="code == null"></div>
+    <div v-else>
+      <h3>请稍等。。</h3>
+    </div>
+  </div>
+</template>
 
 <script>
 import axios from "axios";
 export default {
   data() {
-    return {};
+    return {
+      code: null
+    };
   },
   methods: {},
-  mounted() {
-    this.current_user.strid = "63495249";
-    this.current_user.nickname = "lanqiukun";
-    this.current_user.token = "16409691636468435972";
-    this.current_user.avatar = "https://bucket20200319.oss-cn-shenzhen.aliyuncs.com/test/avatar.jpg";
-    this.current_user.login = true;
+  created() {
+    
+    let localStorageStrid = localStorage.getItem("strid");
+    let localStorageToken = localStorage.getItem("token");
+    if (!localStorageStrid || !localStorageToken) {
+      console.log("local storage 没有保存凭据");
 
-    this.initWebSocket();
-    return;
-    let code = this.getPara("code");
-    if (code == null) this.$router.replace("/login");
-    else {
-      axios
-        .post(
-          "http://116.85.40.216:8080/wstokenuserid",
-          {
-            code
-          },
-          {
-            headers: {
-              "Content-Type": "application/json"
+      this.code = this.getPara("code");
+      if (this.code == null) this.$router.replace("/login");
+      else {
+        console.log(this.server);
+        axios
+          .post(
+            this.server + "/getidtoken",
+            {
+              code: this.code
+            },
+            {
+              headers: {
+                "Content-Type": "application/json"
+              }
             }
-          }
+          )
+          .then(res => {
+            if (res.data.status == 1) {
+              alert(res.data.reason);
+              this.$router.replace("/");
+              return;
+            }
+
+            let data = res.data;
+
+            console.log(res);
+            this.current_user.strid = data.strid;
+            this.current_user.nickname = data.nickname;
+            this.current_user.avatar = data.avatar_url;
+            this.current_user.token = data.token;
+            this.current_user.login = true;
+
+            //将凭据写入localStorage
+            localStorage.setItem("strid", data.strid);
+            localStorage.setItem("token", data.token);
+            console.log("已将凭据保存至local storage");
+
+            console.log(this.current_user.strid);
+            console.log(this.current_user.nickname);
+            console.log(this.current_user.avatar);
+            console.log(this.current_user.token);
+
+            console.log("令牌、user_id请求成功");
+            this.initWebSocket();
+          })
+          .catch(err => {
+            alert("未知错误，登录失败,请重试！");
+            this.$router.replace("/");
+          });
+      }
+    } else {
+      console.log("尝试使用local storage保存的凭据");
+      axios
+        .get(
+          this.server +
+            "/authenticationcredentials?id=" +
+            localStorageStrid +
+            "&token=" +
+            localStorageToken
         )
         .then(res => {
-          let data = res.data;
-          console.log(res);
-          this.current_user.strid = data.id;
-          this.current_user.nickname = data.nickname;
-          this.current_user.avatar = data.avatar_url;
-          this.current_user.token = data.ws_token;
-          this.current_user.login = true;
+          console.log(res.data);
+          console.log(res.data.valid_credentials);
+          if (res.data.valid_credentials) {
+            console.log("使用local storage中的凭据通过了服务器验证");
+            this.current_user.strid = localStorageStrid
+            this.current_user.token = localStorageToken
+            this.initWebSocket();
+            return;
+          } else {
+            console.log("local storage保存的凭据无效");
 
-          //   console.log(this.current_user.strid)
-          //   console.log(this.current_user.nickname)
-          //   console.log(this.current_user.avatar)
-          //   console.log(this.current_user.ws_token)
-
-          //   console.log("令牌、user_id请求成功");
-          this.initWebSocket();
+            localStorage.removeItem("strid");
+            localStorage.removeItem("token");
+          }
         })
         .catch(err => {
-          alert("登录失败,请重试！");
-          this.$router.replace("/login")
+          console.log(err);
+          console.log("发生了错误，正在清除local storage中的凭据");
+          localStorage.removeItem("strid");
+          localStorage.removeItem("token");
         });
     }
   }

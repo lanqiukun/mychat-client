@@ -13,11 +13,14 @@ new Vue({
 }).$mount('#app')
 
 
+
 require('./assets/css/nomalize.css')
 require('./assets/css/basic.css')
 require('./assets/css/font.css')
 
 require('./utils.js')
-require('./websocket.js')
+
+//websocket有依赖于request.js的变量
 require('./request.js')
+require('./websocket.js')
 

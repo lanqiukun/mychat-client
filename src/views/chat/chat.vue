@@ -45,6 +45,7 @@ export default {
   components: {},
   created() {
     console.log("chat created");
+    console.log(this.$store.state.contact)
   },
   destroyed() {
     console.log("chat destroy");

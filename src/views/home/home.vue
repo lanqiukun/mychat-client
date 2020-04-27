@@ -47,21 +47,29 @@ export default {
   },
   created() {
     console.log("home component created")
-    console.log(this.current_user.strid
-    )
+    this.current_user.strid
+
+
+    this.fillinfo(this.current_user.strid, this.current_user)
+
   },
 
   mounted() {
 
     console.log("正在请求联系人数据")
-    let requestContactUrl = "http://116.85.40.216:8080/getcontact?id=" + this.current_user.strid + "&token=" + this.current_user.token
+    let requestContactUrl = this.server + "/getcontact?id=" + this.current_user.strid + "&token=" + this.current_user.token
     console.log(requestContactUrl)
     axios.get(requestContactUrl).then(res => {
       let data = res.data
       console.log("data is: ")
       console.log(data)
-      if (data.status == 1)
+      if (data.status == 1) {
+        console.log("请求联系人信息失败")
         alert(data.reason)
+        this.login = false
+        this.$router.replace("/")
+        return
+      }
       
       let str = data.body
       // str = '[{"nickname":"Edison","avatar":"https://bucket20200319.oss-cn-shenzhen.aliyuncs.com/test/avatar.jpg","alias":"Mychat Author","strid":"98688141287751680"}]'
@@ -75,6 +83,7 @@ export default {
       console.log(this.$store.state.relation)
       console.log("初始化联系人信息成功")
     }).catch(err => {
+      console.log(456)
       alert(err)
     })
   },
