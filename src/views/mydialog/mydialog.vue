@@ -128,11 +128,11 @@ export default {
 
       let mydialogbody = document.getElementById("mydialogbody");
 
-      for (let i = 0; i < 10; i++)
+      for (let i = 0; i < 5; i++)
         setTimeout(() => {
           mydialogbody.scrollTop =
             mydialogbody.scrollHeight - mydialogbody.clientHeight;
-        }, i * 50);
+        }, i * 200);
     }
   },
   computed: {},

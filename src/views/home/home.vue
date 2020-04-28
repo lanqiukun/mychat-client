@@ -61,8 +61,7 @@ export default {
     console.log(requestContactUrl)
     axios.get(requestContactUrl).then(res => {
       let data = res.data
-      console.log("data is: ")
-      console.log(data)
+
       if (data.status == 1) {
         console.log("请求联系人信息失败")
         alert(data.reason)
@@ -72,18 +71,17 @@ export default {
       }
       
       let str = data.body
-      // str = '[{"nickname":"Edison","avatar":"https://bucket20200319.oss-cn-shenzhen.aliyuncs.com/test/avatar.jpg","alias":"Mychat Author","strid":"98688141287751680"}]'
+      
       console.log("str: " + str)
       let body = JSON.parse(str)
       
-      // console.log("body: ")
-      // console.log(body)
+
       
       this.$store.state.relation = body
-      console.log(this.$store.state.relation)
+
       console.log("初始化联系人信息成功")
     }).catch(err => {
-      console.log(456)
+ 
       alert(err)
     })
   },

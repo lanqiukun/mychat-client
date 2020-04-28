@@ -1,29 +1,30 @@
 import Vue from 'vue'
 
 //1 表示开发环境，0表示线上环境
-let environment = 0
+let environment = 1
 
 
 
 
-let localhost = "http://192.168.31.253:80"
-let remotehost = "http://116.85.40.216:80"
+const http_protocol = "http://"
+const ws_protocol = "ws://"
 
-let localserver = "http://192.168.31.253:8080"
-let remoteserver = "http://116.85.40.216:8080"
+const devhost = "localhost"
+const onlinehost = "116.85.40.216"
 
-let localwsserver = "ws://192.168.31.253:8080"
-let remotewsserver = "ws://116.85.40.216:8080"
+const front_port = ":80"
+const server_port = ":8080"
+
 
 
 if (environment == 1) {
-    Vue.prototype.host = localhost
-    Vue.prototype.server = localserver
-    Vue.prototype.wsserver = localwsserver
+    Vue.prototype.host =   http_protocol + devhost + front_port
+    Vue.prototype.server = http_protocol + devhost + server_port
+    Vue.prototype.wsserver = ws_protocol + devhost + server_port
 } else {
-    Vue.prototype.host = remotehost
-    Vue.prototype.server = remoteserver
-    Vue.prototype.wsserver = remotewsserver
+    Vue.prototype.host =   http_protocol + onlinehost + front_port
+    Vue.prototype.server = http_protocol + onlinehost + server_port
+    Vue.prototype.wsserver = ws_protocol + onlinehost + server_port
 
 }
 
