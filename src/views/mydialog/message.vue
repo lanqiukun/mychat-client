@@ -13,12 +13,21 @@
       <span>file:{{payload.body}}</span>
     </div>
 
-    <div v-if="payload.type == 2" class="image" :class="{imageContainerfullscreen}" @click="imageContainerClicked">
-      <img :src="payload.body" alt />
+    <div
+      v-if="payload.type == 2"
+      class="image"
+      :class="{imageContainerfullscreen}"
+      @click="imageContainerClicked"
+    >
+      <div>
+        <img :style="{opacity: uploadedPercent}" :src="memoryUrl" alt />
+        <div class="progressBar" :style="{width: progressBarWidth}" v-show="!finished"></div>
+      </div>
     </div>
 
     <div v-if="payload.type == 3" class="video">
-      <span>video:{{payload.body}}</span>
+      <video controls :src="this.createObjectURL(payload.body)" alt />
+      <div class="progressBar" :style="{width: progressBarWidth}" v-show="!finished"></div>
     </div>
 
     <div v-if="payload.type == 4" class="audio">
@@ -28,6 +37,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   props: {
     payload: Object,
@@ -37,39 +47,58 @@ export default {
     return {
       selfAvatar: this.current_user.avatar,
       imageContainerfullscreen: false,
+      uploaded: false,
+      uploadedPercent: 0,
+      finished: false
     };
+  },
+  computed: {
+    memoryUrl() {
+      return this.createObjectURL(payload.body)
+    },
+    progressBarWidth() {
+      return String(this.uploadedPercent * 100) + "%";
+    },
   },
   methods: {
     imageContainerClicked() {
       this.imageContainerfullscreen = !this.imageContainerfullscreen;
-      
-    },
-    sendFile(e) {
+    }
+  },
+  mounted() {
+    return
+    if (this.payload.type == 0 || this.uploaded) return;
 
-      let config = {
-                      headers: { "Content-Type": "multipart/form-data" },
-                      onUploadProgress: myProgressEvent => {
-                        if (myProgressEvent.lengthComputable) 
-                          console.log(myProgressEvent.loaded, myProgressEvent.total)                       
-                      },
-                    };
+    console.log("开始上传：", this.payload.body.name);
 
-      let uploadUrl = this.server + "/upload";
+    let param = new FormData();
 
-      axios
-        .post(uploadUrl, param, config)
-        .then(res => {
-        
-          if (res.data.status == 0) {
-            console.log(res.data)
-          } else {
-            alert(res.data.reason);
-          }
-        })
-        .catch(err => {
-          alert(err);
-        });
-    },
+    param.append("multiplefiles", this.payload.body);
+
+    let config = {
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: myProgressEvent => {
+        if (myProgressEvent.lengthComputable)
+          this.uploadedPercent = myProgressEvent.loaded / myProgressEvent.total;
+      }
+    };
+
+    let uploadUrl = this.server + "/upload";
+
+    axios
+      .post(uploadUrl, param, config)
+      .then(res => {
+        if (res.data.status == 0) {
+          this.finished = true;
+        } else {
+          alert(res.data.reason);
+        }
+      })
+      .catch(err => {
+        alert(err);
+      });
+
+    this.uploaded = true;
   }
 };
 </script>
@@ -78,6 +107,13 @@ export default {
 $avatar_size: 40px;
 $bubble_color: #ffc78e;
 $bubble_selfsend_color: rgba(100, 124, 237, 0.5);
+
+.progressBar {
+  width: 100%;
+  height: 2px;
+  background-color: coral;
+  border-radius: 1px;
+}
 
 #message.selfsend {
   flex-direction: row-reverse;
@@ -146,6 +182,17 @@ $bubble_selfsend_color: rgba(100, 124, 237, 0.5);
       padding: 0;
       border-radius: 0;
       margin: 0;
+    }
+  }
+
+  > .video {
+      width: 60%;
+      margin: 0 10px;
+      video {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      border-radius: 5px;
     }
   }
 

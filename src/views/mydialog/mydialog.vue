@@ -87,7 +87,7 @@
 import message from "./message";
 import emoji from "./emoji";
 import multipart from "./multipart";
-import axios from "axios";
+
 
 export default {
   name: "mydialog",
@@ -142,19 +142,18 @@ export default {
     back_to_session() {
       this.$router.replace("/home/chat").catch(a => 0);
     },
-    send_message(event, type = 0, memoryUrl) {
-      
+    send_message(event, type = 0, file) {
+
 
       this.showSendButton = false;
       
       if (type == 0 && !this.hasMessageContent) return;
 
 
-      let messageBody = type == 0 ? this.message : memoryUrl
       let msg2local = {
         selfsend: true,
         type,
-        body: messageBody,
+        body: type == 0 ? this.message : file,
         time: new Date().Format("yyyy-MM-dd hh:mm:ss")
       };
 
@@ -188,14 +187,11 @@ export default {
       this.message += emoji;
     },
 
-    sendFile(e) {
+    sendFile(type, files) {
       this.showMultipartPanel = false
 
-      let param = new FormData();
-
-      for (let i of e.target.files) {
-        this.send_message(null, 2, this.createObjectURL(i))
-        param.append("multiplefiles", i);
+      for (let file of files) {
+        this.send_message(null, type, file)
       }
       
     },

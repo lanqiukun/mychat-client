@@ -2,7 +2,7 @@
   <div id="multipart">
     <div @click="selectFile">
       <img src="../../assets/img/mydialog/file.png" alt />
-      <input id="files" type="file" name="files" @change="fileChange($event, 1)" multiple />
+      <input id="files" type="file" name="files" @change="fileChange(1, $event)" multiple />
     </div>
     <div @click="selectImageFile">
       <img src="../../assets/img/mydialog/picture.png" alt />
@@ -10,7 +10,7 @@
         id="imagefiles"
         type="file"
         name="imagefiles"
-        @change="fileChange($event, 2)"
+        @change="fileChange(2, $event)"
         accept="image/*"
         multiple
       />
@@ -21,7 +21,7 @@
         id="videofiles"
         type="file"
         name="videofiles"
-        @change="fileChange($event, 3)"
+        @change="fileChange(3, $event)"
         accept="video/*"
         multiple
       />
@@ -32,7 +32,7 @@
         id="audiofiles"
         type="file"
         name="audiofiles"
-        @change="fileChange($event, 4)"
+        @change="fileChange(4, $event)"
         accept="audio/*"
         multiple
       />
@@ -67,8 +67,8 @@ export default {
       this.audiofiles.click();
     },
 
-    fileChange(e, type) {
-      this.$emit("sendFile", e, type)
+    fileChange(type, event) {
+      this.$emit("sendFile", type, event.target.files)
     },
 
   },
