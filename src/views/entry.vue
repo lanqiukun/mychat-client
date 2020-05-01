@@ -17,7 +17,15 @@ export default {
   },
   methods: {},
   created() {
-    
+
+    if (!this.isMobile()) {
+      localStorage.setItem("strid", "63495249");
+      localStorage.setItem("token", "3110679384859815046");
+    } else {
+      localStorage.setItem("strid", "53718011");
+      localStorage.setItem("token", "15659457055628006996");
+    }
+
     let localStorageStrid = localStorage.getItem("strid");
     let localStorageToken = localStorage.getItem("token");
     if (!localStorageStrid || !localStorageToken) {
@@ -41,7 +49,7 @@ export default {
           )
           .then(res => {
             if (res.data.status == 1) {
-              alert(res.data.reason);
+              alert(res.data.reason + "请再试一次");
               this.$router.replace("/");
               return;
             }
@@ -58,15 +66,12 @@ export default {
             //将凭据写入localStorage
             localStorage.setItem("strid", data.strid);
             localStorage.setItem("token", data.token);
+
             console.log("已将凭据保存至local storage");
-
-            console.log(this.current_user.strid);
-            console.log(this.current_user.nickname);
-            console.log(this.current_user.avatar);
-            console.log(this.current_user.token);
-
             console.log("令牌、user_id请求成功");
-            this.initWebSocket();
+            console.log("合法用户进入home界面");
+
+            this.$router.replace("/home");
           })
           .catch(err => {
             alert("未知错误，登录失败,请重试！");
@@ -88,9 +93,10 @@ export default {
           console.log(res.data.valid_credentials);
           if (res.data.valid_credentials) {
             console.log("使用local storage中的凭据通过了服务器验证");
-            this.current_user.strid = localStorageStrid
-            this.current_user.token = localStorageToken
-            this.initWebSocket();
+            this.current_user.strid = localStorageStrid;
+            this.current_user.token = localStorageToken;
+            console.log("合法用户进入home界面");
+            this.$router.replace("/home");
             return;
           } else {
             console.log("local storage保存的凭据无效");

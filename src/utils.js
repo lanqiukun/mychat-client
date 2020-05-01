@@ -40,3 +40,12 @@ Vue.prototype.getPara = function (variable) {
 Vue.prototype.isMobile = function () {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
+
+
+Vue.prototype.createObjectURL = function (object) {
+    return (window.URL) ? window.URL.createObjectURL(object) : window.webkitURL.createObjectURL(object);
+}
+
+Vue.prototype.revokeObjectURL = function (url) {
+    return (window.URL) ? window.URL.revokeObjectURL(url) : window.webkitURL.revokeObjectURL(url);
+}

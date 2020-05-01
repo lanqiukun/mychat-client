@@ -9,7 +9,7 @@ let environment = 1
 const http_protocol = "http://"
 const ws_protocol = "ws://"
 
-const devhost = "localhost"
+const devhost = "192.168.31.253"
 const onlinehost = "116.85.40.216"
 
 const front_port = ":80"
@@ -45,6 +45,10 @@ Vue.prototype.fillinfo = function (strid, target) {
                 target.nickname = body.nickname
                 console.log("fillinfo finished")
                 console.log(Vue.prototype.current_user)
+                
+                if (strid == target.strid)
+                    console.log("当前用户信息获取成功")
+
             }
         }).catch(err => {
             console.log("请求联系人信息时发生错误")

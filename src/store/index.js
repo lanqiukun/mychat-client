@@ -16,11 +16,13 @@ export default new Vuex.Store({
       //       selfsend: true,
       //       body: "吃鸡么",
       //       time: "2020-4-19 5:20:50"
+      //       type: 0
       //     },
       //     {
       //       selfsend: false,
       //       body: "来呀，我有挂",
       //       time: "2020-4-19 20:50:20"
+      //       type: 0
       //     }
       //   ]
       // },

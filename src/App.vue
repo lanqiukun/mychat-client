@@ -1,8 +1,8 @@
 <template>
   <div id="appvue">
-    <!-- <keep-alive> -->
+    <keep-alive>
     <router-view></router-view>
-    <!-- </keep-alive> -->
+    </keep-alive>
   </div>
 </template>
 

@@ -45,11 +45,16 @@ function onclose(e) {
 
 function onopen() {
 
-    router.replace("/home").catch(a => 0)
+    console.log("websocket连接成功建立")
+
 
 }
 
 import store from './store/index.js'
+
+
+// let audio = new Audio("https://bucket20200319.oss-cn-shenzhen.aliyuncs.com/mychat/audio/tips.mp3")
+let audio = new Audio(require('./assets/audio/tips.mp3'))
 
 
 function onmessage(e) {
@@ -64,9 +69,18 @@ function onmessage(e) {
     }
 
 
+    
+
+
+
+    
+
+
+
     //处理好友消息
     if (res.response_type == 0) {
         handle_message(res)
+        audio.play()
         return
     }
 
@@ -112,18 +126,10 @@ function handle_message(res) {
     let target_contact = store.getters.getContact(res.sender_str_id)
 
     if (!target_contact) {
-        console.log("产生信的对话框")
+       
         //first of all 先去联系人列表里面找出发消息的这个人
         let contact = store.getters.getRelation(res.sender_str_id)
 
-        console.log("对方是： ")
-        console.log(contact)
-
-
-        console.log(res)
-        console.log(res.sender_str_id)
-        console.log(res.avatar)
-        console.log(res.nickname)
         store.state.contact.push({
             strid: contact.strid,
             avatar: contact.avatar,
@@ -139,6 +145,7 @@ function handle_message(res) {
     store.getters.pushMessageAndUpdateOrder({
         selfsend: false,
         body: res.body,
+        type: res.type,
         time: new Date().Format("yyyy-MM-dd hh:mm:ss")
     }, target_contact)
 

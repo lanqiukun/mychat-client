@@ -16,7 +16,7 @@
     </div>
     <div style="height: 49px"></div>
 
-    <div id="mydialogbody" @scroll="handle_scroll">
+    <div id="mydialogbody"  @click="messagesClicked">
       <div class="messages" v-if="contact">
         <message
           v-for="(message, index) in contact.message"
@@ -27,24 +27,53 @@
       </div>
     </div>
 
+    <div id="emojiPanel" v-if="showEmojiPanel">
+      <emoji @addEmoji="addEmoji"></emoji>
+    </div>
+
+    <div id="multipartPanel" v-if="showMultipartPanel">
+      <multipart @sendFile="sendFile"></multipart>
+    </div>
+
     <div id="mydialogfoot">
-      <div class="voice">
+      <div class="voice icon" @click="debug">
         <div>
           <img src="../../assets/img/mydialog/voice.png" alt />
         </div>
       </div>
 
       <div class="input">
-        <input v-on:keyup.enter="send_message" type="text" v-model="message" v-focus="true" />
+        <input
+          v-on:keyup.enter="send_message"
+          type="text"
+          v-model="message"
+          v-focus="true"
+          @focus="inputFocus"
+          @blur="inputBlur"
+        />
+        <!-- <textarea
+       
+          rows="2"
+          v-model="message"
+          v-focus="true"
+          @focus="inputFocus"
+          @blur="inputBlur"
+        ></textarea>-->
       </div>
 
-      <div class="emoji">
+      <div class="emoji icon" @click="toggleEmojiPanel">
         <div>
           <img src="../../assets/img/mydialog/emoji.png" alt />
         </div>
       </div>
 
-      <div class="more">
+      <div v-show="hasMessageContent" class="send icon" @click="click2send">
+        <div>
+          <img src="../../assets/img/mydialog/send.png" alt />
+        </div>
+      </div>
+
+      <div v-show="!hasMessageContent" class="more icon" @click="toggleMultipartPanel">
         <div>
           <img src="../../assets/img/mydialog/domore.png" alt />
         </div>
@@ -56,6 +85,9 @@
 
 <script>
 import message from "./message";
+import emoji from "./emoji";
+import multipart from "./multipart";
+import axios from "axios";
 
 export default {
   name: "mydialog",
@@ -64,13 +96,35 @@ export default {
       strid: null,
       contact: null,
       relation: null,
-      message: ""
+      message: "",
+      showEmojiPanel: false,
+      showMultipartPanel: false,
+      mydialogbody: null,
     };
   },
   components: {
-    message
+    message,
+    emoji,
+    multipart
+  },
+
+  computed: {
+    hasMessageContent() {
+      return this.message.length >= 1;
+    }
   },
   methods: {
+    messagesClicked() {
+      this.showEmojiPanel = false;
+      this.showMultipartPanel = false;
+    },
+    debug() {
+      console.log(
+        this.showEmojiPanel,
+        this.showSendButton,
+        this.showMultipartPanel
+      );
+    },
     debugInfo() {
       console.log(this.contact);
       console.log(this.relation);
@@ -78,32 +132,33 @@ export default {
       console.log(this.$store.state.relation);
     },
     handle_scroll() {
-      console.log(document.getElementById("mydialogbody").scrollHeight);
-      console.log(document.getElementById("mydialogbody").clientHeight);
-      console.log(document.getElementById("mydialogbody").scrollTop);
+      console.log(this.mydialogbody.scrollHeight);
+      console.log(this.mydialogbody.clientHeight);
+      console.log(this.mydialogbody.scrollTop);
+      
+
+
     },
     back_to_session() {
       this.$router.replace("/home/chat").catch(a => 0);
     },
-    send_message() {
-      let msg2server = {
-        sender_str_id: this.current_user.strid,
-        receiver_str_id: this.strid,
-        type: 0,
-        body: this.message
-      };
+    send_message(event, type = 0, memoryUrl) {
+      
 
+      this.showSendButton = false;
+      
+      if (type == 0 && !this.hasMessageContent) return;
+
+
+      let messageBody = type == 0 ? this.message : memoryUrl
       let msg2local = {
         selfsend: true,
-        body: this.message,
+        type,
+        body: messageBody,
         time: new Date().Format("yyyy-MM-dd hh:mm:ss")
       };
 
-      console.log(msg2server.sender_str_id, msg2server.receiver_str_id);
 
-      if (this.message === "") this.message = " ";
-
-      //没有该联系人的活跃聊天
       if (!this.contact) {
         this.$store.state.contact.push({
           strid: this.relation.strid,
@@ -111,43 +166,66 @@ export default {
           nickname: this.relation.nickname,
           message: []
         });
-        console.log(this.relation);
-        console.log(this.$store.state.contact);
         this.contact = this.$store.getters.getContact(this.strid);
-        console.log(this.contact);
       }
 
-      // console.log(this.relation)
-      // console.log(this.contact)
-
       this.$store.getters.pushMessageAndUpdateOrder(msg2local, this.contact);
+      if (type == 0) {
+              let msg2server = {
+                sender_str_id: this.current_user.strid,
+                receiver_str_id: this.strid,
+                type,
+                body: this.message
+              };
+        this.ws.send(JSON.stringify(msg2server));
+        this.message = "";
+      }
 
-      this.ws.send(JSON.stringify(msg2server));
+      setTimeout(() => mydialogbody.scrollTop = mydialogbody.scrollHeight - mydialogbody.clientHeight, 50);
+      setTimeout(() => mydialogbody.scrollTop = mydialogbody.scrollHeight - mydialogbody.clientHeight, 500);
+    },
+    addEmoji(emoji) {
+      this.message += emoji;
+    },
 
-      this.message = "";
+    sendFile(e) {
+      this.showMultipartPanel = false
 
-      let mydialogbody = document.getElementById("mydialogbody");
+      let param = new FormData();
 
-      for (let i = 0; i < 5; i++)
-        setTimeout(() => {
-          mydialogbody.scrollTop =
-            mydialogbody.scrollHeight - mydialogbody.clientHeight;
-        }, i * 200);
+      for (let i of e.target.files) {
+        this.send_message(null, 2, this.createObjectURL(i))
+        param.append("multiplefiles", i);
+      }
+      
+    },
+    
+    toggleEmojiPanel() {
+      this.showEmojiPanel = !this.showEmojiPanel;
+    },
+    toggleMultipartPanel() {
+      this.showMultipartPanel = !this.showMultipartPanel;
+    },
+    inputFocus() {
+      // this.showSendButton = true
+    },
+    inputBlur() {
+      // this.showSendButton = false
+    },
+    click2send() {
+      this.send_message();
+      this.showEmojiPanel = false;
     }
   },
-  computed: {},
   mounted() {
-    console.log(11111111111)
-    console.log(this.current_user.avatar)
-    console.log(this.current_user.strid)
-    console.log(this.current_user.token)
-    console.log(this.current_user.nickname)
+    this.mydialogbody = document.getElementById("mydialogbody");
+
+
   },
   created() {
     this.strid = this.$route.params.target;
     this.contact = this.$store.getters.getContact(this.strid);
     this.relation = this.$store.getters.getRelation(this.strid);
-
     console.log(this.contact);
     console.log(this.relation);
 
@@ -176,6 +254,7 @@ export default {
 
 #mydialoghead {
   position: fixed;
+  z-index: 1000;
   top: 0;
   width: 100%;
   background-color: #090723;
@@ -194,6 +273,10 @@ export default {
   width: 100%;
   height: 35px;
 
+  > .icon:hover {
+    cursor: pointer;
+  }
+
   border-top: thin solid rgba(128, 128, 128, 0.2);
 
   display: flex;
@@ -202,25 +285,32 @@ export default {
   align-items: center;
   > .input {
     width: calc(100% - 28px - 28px - 28px - 28px);
-    > input {
+    > * {
       width: 100%;
       height: 23px;
+      display: block;
+      flex-grow: 1;
+      padding: 0;
+      margin: 0;
+      border: none;
+      background-color: transparent;
+      position: relative;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.4);
+      outline: none;
+      overflow: hidden;
+      resize: none;
+    }
+    > *:focus {
+      border-bottom: 1px solid rgba(0, 128, 0, 0.4);
     }
   }
-  > div > input {
-    display: block;
-    flex-grow: 1;
-    padding: 0;
-    margin: 0;
-    border: none;
-    background-color: transparent;
-    position: relative;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.4);
-    outline: none;
-  }
-  > div > input:focus {
-    border-bottom: 1px solid rgba(0, 128, 0, 0.4);
-  }
+}
+
+#emojiPanel,
+#multipartPanel {
+  position: fixed;
+  width: 100%;
+  bottom: 50px;
 }
 </style>
 

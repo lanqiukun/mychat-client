@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+
+    <audio id="au" onclick="agree()" src="https://bucket20200319.oss-cn-shenzhen.aliyuncs.com/mychat/audio/tips.mp3" controls></audio>
+
+
+    <button onclick="agree()">agree to autoplay audio</button>
+
+    <script>
+        function agree() {
+            document.getElementById("au").play()
+        }
+
+    </script>
+
+</body>
+
+</html>
