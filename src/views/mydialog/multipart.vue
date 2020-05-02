@@ -94,6 +94,7 @@ export default {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-around;
+  background-color: rgba(255, 250, 250, 0.75);
   > div {
     border-radius: 50%;
     > input {

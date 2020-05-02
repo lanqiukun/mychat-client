@@ -16,7 +16,11 @@
         </div>
 
         <div class="lastmessage">
-          <div>{{item.message.slice(-1)[0].body}}</div>
+          <div v-if="item.message.slice(-1)[0].type == 0"  v-html="item.message.slice(-1)[0].body">{{item.message.slice(-1)[0].body}}</div>
+          <div v-if="item.message.slice(-1)[0].type == 1" style="letter-spacing: 4px">[文件]</div>
+          <div v-if="item.message.slice(-1)[0].type == 2" style="letter-spacing: 4px">[图片]</div>
+          <div v-if="item.message.slice(-1)[0].type == 3" style="letter-spacing: 4px">[视频]</div>
+          <div v-if="item.message.slice(-1)[0].type == 4" style="letter-spacing: 4px">[音频]</div>
         </div>
       </div>
 
@@ -36,6 +40,9 @@ export default {
     return {
       contact: this.$store.state.contact
     };
+  },
+  computed: {
+    lastMessage() {}
   },
   methods: {
     open_dialog(strid) {
@@ -121,7 +128,7 @@ export default {
 }
 
 .lastmessage div {
-  height: 13px;
+  height: 15px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

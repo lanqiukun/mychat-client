@@ -143,7 +143,8 @@ export default {
       this.$router.replace("/home/chat").catch(a => 0);
     },
     send_message(event, type = 0, file) {
-
+      
+      this.message = this.message.replace(/ /g,"&nbsp;")
 
       this.showSendButton = false;
       
@@ -153,8 +154,9 @@ export default {
       let msg2local = {
         selfsend: true,
         type,
-        body: type == 0 ? this.message : file,
-        time: new Date().Format("yyyy-MM-dd hh:mm:ss")
+        body: type == 0 ?  this.message : file,
+        time: new Date().Format("yyyy-MM-dd hh:mm:ss"),
+        receiver_str_id: this.contact ? this.contact.strid : this.relation.strid
       };
 
 
@@ -163,7 +165,7 @@ export default {
           strid: this.relation.strid,
           avatar: this.relation.avatar,
           nickname: this.relation.nickname,
-          message: []
+          message: [],
         });
         this.contact = this.$store.getters.getContact(this.strid);
       }
@@ -198,9 +200,16 @@ export default {
     
     toggleEmojiPanel() {
       this.showEmojiPanel = !this.showEmojiPanel;
+      
+      if (this.showEmojiPanel)
+        this.showMultipartPanel = false
+
     },
     toggleMultipartPanel() {
       this.showMultipartPanel = !this.showMultipartPanel;
+
+      if (this.showMultipartPanel)
+        this.showEmojiPanel = false
     },
     inputFocus() {
       // this.showSendButton = true
@@ -306,7 +315,7 @@ export default {
 #multipartPanel {
   position: fixed;
   width: 100%;
-  bottom: 50px;
+  bottom: 36px;
 }
 </style>
 
