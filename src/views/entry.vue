@@ -18,18 +18,24 @@ export default {
   methods: {},
   created() {
 
-    if (!this.isMobile()) {
-      localStorage.setItem("strid", "63495249");
-      localStorage.setItem("token", "3110679384859815046");
-    } else {
-      localStorage.setItem("strid", "53718011");
-      localStorage.setItem("token", "15659457055628006996");
-    }
+    // if (!this.isMobile()) {
+    //   localStorage.setItem("strid", "63495249");
+    //   localStorage.setItem("token", "8864800962862880338");
+    // } else {
+    //   localStorage.setItem("strid", "53718011");
+    //   localStorage.setItem("token", "15659457055628006996");
+    // }
+
+    // this.current_user.login = true;
+
 
     let localStorageStrid = localStorage.getItem("strid");
     let localStorageToken = localStorage.getItem("token");
     if (!localStorageStrid || !localStorageToken) {
       console.log("local storage 没有保存凭据");
+
+      this.$router.replace("/email-login")
+      return
 
       this.code = this.getPara("code");
       if (this.code == null) this.$router.replace("/login");
@@ -49,7 +55,7 @@ export default {
           )
           .then(res => {
             if (res.data.status == 1) {
-              alert(res.data.reason + "请再试一次");
+              alert(res.data.reason);
               this.$router.replace("/");
               return;
             }
@@ -68,7 +74,7 @@ export default {
             localStorage.setItem("token", data.token);
 
             console.log("已将凭据保存至local storage");
-            console.log("令牌、user_id请求成功");
+            console.log("用户信息请求成功");
             console.log("合法用户进入home界面");
 
             this.$router.replace("/home");

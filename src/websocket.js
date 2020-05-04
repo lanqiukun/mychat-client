@@ -32,6 +32,7 @@ function onerror() {
 
 
 function onclose(e) {
+    console.log(e)
     if (Vue.prototype.current_user.login) {
         console.log('连接中断,正在重新连接', e)
         setTimeout(() => {
@@ -115,8 +116,13 @@ function onmessage(e) {
 function handle_error(res) {
     //先别重试了,用户的凭据不可用
     Vue.prototype.current_user.login = false
-    console.log(11111)
+
     alert(res.reason)
+    
+
+    if (res.code == 1)
+        router.replace("/email-login").catch(a => 0)
+
     //让用户重新去登录页面
     router.replace("/").catch(a => 0)
 }

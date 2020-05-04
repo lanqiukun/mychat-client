@@ -49,3 +49,10 @@ Vue.prototype.createObjectURL = function (object) {
 Vue.prototype.revokeObjectURL = function (url) {
     return (window.URL) ? window.URL.revokeObjectURL(url) : window.webkitURL.revokeObjectURL(url);
 }
+
+Vue.prototype.validateEmail = function (email) {
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
+        return (true)
+
+    return (false)
+}

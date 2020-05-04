@@ -19,23 +19,10 @@ export default {
     };
   },
   methods: {
-    getQueryVariable(variable) {
-      var query = window.location.search.substring(1);
-      var vars = query.split("&");
-      for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split("=");
-        if (pair[0] == variable) {
-          return pair[1];
-        }
-      }
-      return null;
-    },
-
     github_login() {
       this.clicked = false;
 
-      if (this.getQueryVariable("code") == null)
-        window.location.href = "https://github.com/login/oauth/authorize?client_id=ba3fb2199f63b790df64&scope=user:email";
+      window.location.href = "https://github.com/login/oauth/authorize?client_id=ba3fb2199f63b790df64&scope=user:email";
     }
   },
   mounted() {}

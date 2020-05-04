@@ -107,10 +107,6 @@ export default {
     }
   },
   mounted() {
-    if (!this.payload.selfsend) {
-      this.imgOpacity = 1
-      return
-    }
     if (this.payload.type == 0 || this.uploaded) return;
     
 

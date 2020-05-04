@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 
 const entry = () => import('../views/entry.vue')
 const login = () => import('../views/login/login.vue')
+const emailLogin = () => import('../views/login/email_login.vue')
 
 const home = () => import('../views/home/home.vue')
 const chat = () => import('../views/chat/chat.vue')
@@ -36,6 +37,10 @@ const routes = [
   {
     path: '/login',
     component: login
+  },
+  {
+    path: '/email-login',
+    component: emailLogin
   },
 
   {
