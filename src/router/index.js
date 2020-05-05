@@ -4,6 +4,8 @@ import VueRouter from 'vue-router'
 const entry = () => import('../views/entry.vue')
 const login = () => import('../views/login/login.vue')
 const emailLogin = () => import('../views/login/email_login.vue')
+const emailRegister = () => import('../views/login/email_register.vue')
+const registered = () => import('../views/login/registered.vue')
 
 const home = () => import('../views/home/home.vue')
 const chat = () => import('../views/chat/chat.vue')
@@ -42,7 +44,14 @@ const routes = [
     path: '/email-login',
     component: emailLogin
   },
-
+  {
+    path: '/email-register',
+    component: emailRegister
+  },
+  {
+    path: '/register-succeed',
+    component: registered
+  },
   {
     path: '/home',
     component: home,

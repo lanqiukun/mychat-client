@@ -4,9 +4,16 @@
       <div class="email-password">
         <input
           type="text"
+          placeholder="输入用户名(可改)"
+          autocomplete="false"
+          autofocus
+          v-model="nickname"
+          @keydown.enter="email2login"
+        />
+        <input
+          type="text"
           placeholder="输入邮箱账号"
           autocomplete
-          autofocus
           v-model="email"
           @keydown.enter="email2login"
         />
@@ -20,7 +27,7 @@
       </div>
 
       <div v-if="!loading" class="login_button unclicked">
-        <div @click="email2login">登 录</div>
+        <div @click="email2login">注 册</div>
       </div>
 
       <div v-if="loading" class="login_button">
@@ -28,7 +35,7 @@
       </div>
     </div>
 
-    <div class="register" @click="register">注 册</div>
+    <div class="register" @click="register">登 录</div>
   </div>
 </template>
 
@@ -38,22 +45,16 @@ import axios from "axios";
 export default {
   data() {
     return {
+      nickname: "",
       email: "",
       password: "",
       loading: false
     };
   },
-  mounted() {
-      let newcomer = this.getPara("newcomer");
-
-      if (newcomer != null) 
-        this.email = decodeURIComponent(newcomer);
-  },
   methods: {
     register() {
-      this.$router.replace("/email-register")
+      this.$router.replace("/email-login");
     },
-    
     email2login() {
       if (!this.validateEmail(this.email)) {
         alert("邮箱格式不正确哦~");
@@ -63,13 +64,19 @@ export default {
         alert("还没有输入密码偶~");
         return;
       }
+      if (this.password.length < 6) {
+        alert("密码至少要6位偶~");
+        return;
+      }
+
       this.loading = true;
-      console.log(this.email, this.password);
+    //   console.log(this.email, this.password);
 
       axios
         .post(
-          this.server + "/verifyemailpassword",
+          this.server + "/email-register",
           {
+            nickname: this.nickname,
             email: this.email,
             password: this.password
           },
@@ -81,36 +88,20 @@ export default {
         )
         .then(res => {
           this.loading = false;
-          
+
           if (res.data.status == 1) {
             alert(res.data.reason);
             this.$router.replace("/");
             return;
           }
           console.log(res.data);
-
-          let data = res.data;
-
-          console.log(res);
-          this.current_user.strid = data.strid;
-          this.current_user.nickname = data.nickname;
-          this.current_user.avatar = data.avatar_url;
-          this.current_user.token = data.token;
-          this.current_user.login = true;
-
-          //将凭据写入localStorage
-          localStorage.setItem("strid", data.strid);
-          localStorage.setItem("token", data.token);
-
-          console.log("已将凭据保存至local storage");
-          console.log("令牌、user_id请求成功");
-          console.log("合法用户进入home界面");
-
-          this.$router.replace("/home");
+          setTimeout(() => {
+              alert("点击你邮箱里的注册链接来激活账户~")
+          }, 200);
         })
         .catch(err => {
           this.loading = false;
-          alert("登录时发生错误");
+          alert("注册时发生错误");
         });
     }
   }
